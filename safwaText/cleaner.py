@@ -1,45 +1,74 @@
 import re
+from typing import List
 
-def remove_tashkeel(text):
-    """
-    Remove Arabic diacritics (Tashkeel) from text.
+# Pre-compile regex patterns for better performance
+ARABIC_DIACRITICS = re.compile(r'[\u0617-\u061A\u064B-\u0652]')
+NORMALIZATION_MAPPING = {
+    r'[إأآا]': 'ا',
+    r'ؤ': 'و',
+    r'ئ': 'ي',
+    r'ة': 'ه',
+    r'ى': 'ي',
+    r'ـ': ''
+}
+ARABIC_CHARS_PATTERN = re.compile(r'[^\u0600-\u06FF\u0750-\u077F\s]')  
+ARABIC_CLEAN_PATTERN = re.compile(
+    r'[^\u0600-\u06FF\s]'    
+    r'|[\u0660-\u0669]'      
+    r'|[\u060C\u061B\u061F]' 
+    r'|[\W_]'                
+)
+WHITESPACE_PATTERN = re.compile(r'\s+')
+
+def remove_tashkeel(text: str) -> str:
+    """Remove Arabic diacritics (Tashkeel) from text.
     
     Args:
-        text (str): Input Arabic text.
-    
+        text: Input Arabic text with diacritics
+        
     Returns:
-        str: Text without diacritics.
+        Cleaned text without diacritics
     """
-    arabic_diacritics = re.compile(r'[\u0617-\u061A\u064B-\u0652]')
-    return re.sub(arabic_diacritics, '', text)
+    return ARABIC_DIACRITICS.sub('', text)
 
-def normalize_text(text):
-    """
-    Normalize Arabic text by standardizing characters.
+def normalize_text(text: str) -> str:
+    """Standardize various Arabic character forms to their base equivalents.
+    
+    Handles:
+    - Unified Alef forms
+    - Ta' marbuta to ha
+    - Ya variants
+    - Tatweel removal
     
     Args:
-        text (str): Input Arabic text.
-    
+        text: Input Arabic text
+        
     Returns:
-        str: Normalized text.
+        Normalized Arabic text
     """
-    text = re.sub(r'[إأآا]', 'ا', text)  
-    text = re.sub(r'ؤ', 'و', text)      
-    text = re.sub(r'ئ', 'ي', text)      
-    text = re.sub(r'ة', 'ه', text)      
-    text = re.sub(r'ى', 'ي', text)      
-    text = re.sub(r'ـ', '', text)      
+    text = remove_tashkeel(text)
+    for pattern, replacement in NORMALIZATION_MAPPING.items():
+        text = re.sub(pattern, replacement, text)
     return text
 
-def remove_non_arabic(text):
-    """
-    Remove non-Arabic characters from text.
+
+
+
+
+def remove_non_arabic(text: str) -> str:
+    """Remove non-Arabic characters, numbers, punctuation, and symbols.
     
+    Cleans text by:
+    1. Removing all non-Arabic script characters
+    2. Removing Arabic numerals (٠-٩)
+    3. Removing punctuation/symbols (both Arabic and Western)
+    4. Normalizing whitespace
+
     Args:
-        text (str): Input text.
-    
+        text: Input text potentially containing mixed characters
+        
     Returns:
-        str: Text with only Arabic characters and whitespace.
+        Cleaned Arabic text with only letters and single spaces
     """
-    text = re.sub(r'[^\u0600-\u06FF\s]', '', text)  
-    return text
+    cleaned = ARABIC_CLEAN_PATTERN.sub(' ', text)
+    return WHITESPACE_PATTERN.sub(' ', cleaned).strip()
