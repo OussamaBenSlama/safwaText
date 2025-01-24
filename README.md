@@ -16,7 +16,6 @@
 Install the package directly from PyPI using pip:
     ```bash
     pip install safwaText
-    ```
 ## Usage
     ```bash
     from safwaText.cleaner import remove_tashkeel, normalize_text, remove_non_arabic
