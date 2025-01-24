@@ -16,7 +16,7 @@
 Install the package directly from PyPI using pip:
     ```bash
     pip install safwaText
-
+    ```
 ## Usage
     ```bash
     from safwaText.cleaner import remove_tashkeel, normalize_text, remove_non_arabic
@@ -37,7 +37,7 @@ Install the package directly from PyPI using pip:
 
     print(final_output)  # Output: "ذهب محمد مدرس صباح"
     ```
-    
+
 ## Contributing
 Contributions are welcome! If you'd like to improve this extension:
 1. Fork the repository.
